@@ -16,6 +16,7 @@ public class Terrain {
     private Vector2 windowDimensions;
     private float groundHeightAtX0;
     private PerslinNoise perslinNoise;
+    private static final int TERRAIN_DEPTH = 20;
     private static final Color BASE_GROUND_COLOR =
                                new Color(212, 123, 74);
 
@@ -44,13 +45,13 @@ public class Terrain {
         int actualMaxX = getAprox(maxX, true);
         int numOfColumn = (actualMaxX - actualMinX) / Block.SIZE;
         for (int i = 0; i < numOfColumn; i++) {
-            int columnHeight = (int) groundHeightAt(i);
-            int numOfBlocksPerColumn = columnHeight / Block.SIZE;
-
+            float columnHeight = (float) Math.floor(groundHeightAt(actualMinX + i * Block.SIZE));
+            int numOfBlocksPerColumn = (int)columnHeight / Block.SIZE -24;
             for (int j = 0; j < numOfBlocksPerColumn; j++) {
                 Renderable renderable =
                         new RectangleRenderable(ColorSupplier.approximateColor(BASE_GROUND_COLOR));
-                Vector2 topLeftCorner= new Vector2(actualMaxX + i * Block.SIZE, windowDimensions.y() - j * Block.SIZE);
+                Vector2 topLeftCorner= new Vector2(actualMinX + i * Block.SIZE,
+                        windowDimensions.y() - j * Block.SIZE - 155);
                 Block block = new Block(topLeftCorner,renderable);
                 gameObjects.addGameObject(block, Layer.STATIC_OBJECTS);
 

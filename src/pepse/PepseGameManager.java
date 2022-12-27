@@ -1,6 +1,7 @@
 package pepse;
 
 import danogl.GameManager;
+import danogl.GameObject;
 import danogl.collisions.Layer;
 import danogl.gui.ImageReader;
 import danogl.gui.SoundReader;
@@ -8,8 +9,15 @@ import danogl.gui.UserInputListener;
 import danogl.gui.WindowController;
 import pepse.world.Sky;
 import pepse.world.Terrain;
+import pepse.world.daynight.Night;
+import pepse.world.daynight.Sun;
+import pepse.world.daynight.SunHalo;
+
+import java.awt.*;
 
 public class PepseGameManager extends GameManager {
+    private static final float CYCLE_LENGTH = 30;
+
     @Override
     public void initializeGame(ImageReader imageReader,
                                SoundReader soundReader,
@@ -19,8 +27,14 @@ public class PepseGameManager extends GameManager {
 
         Sky.create(gameObjects(), windowController.getWindowDimensions(), Layer.BACKGROUND);
         Terrain terrain = new Terrain(gameObjects(), Layer.STATIC_OBJECTS,
-                windowController.getWindowDimensions(),24);
-        terrain.createInRange(200, 400);
+                windowController.getWindowDimensions(),0);
+        terrain.createInRange(0, (int)windowController.getWindowDimensions().x());
+        Night.create(gameObjects(), Layer.FOREGROUND,
+                windowController.getWindowDimensions(),
+                CYCLE_LENGTH);
+        GameObject sun = Sun.create(gameObjects(),Layer.BACKGROUND,windowController.getWindowDimensions(),10);
+        GameObject sunHalo = SunHalo.create(gameObjects(),Layer.BACKGROUND + 10, sun, new Color(255, 255, 0, 20));
+        sunHalo.addComponent(deltaTime -> sunHalo.setCenter(sun.getCenter()));
     }
 
 
