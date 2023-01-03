@@ -10,17 +10,25 @@ import danogl.util.Vector2;
 import java.awt.*;
 
 public class SunHalo {
-    private static final float HALO_RADIUS = 500;
+    private static final float HALO_RADIUS = 400;
 
     public static GameObject create(GameObjectCollection gameObjects,
-                                    int layer, GameObject sun , Color color)  {
+                                    int layer,
+                                    GameObject sun,
+                                    Color color)  {
+
         Renderable renderable = new OvalRenderable(color);
+
         GameObject halo = new GameObject(Vector2.ZERO, Vector2.ONES.mult(HALO_RADIUS), renderable);
-        halo.setTag("halo");
+
         halo.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
-        gameObjects.addGameObject(halo);
-        //halo.addComponent(deltaTime -> halo.setCenter());
+
+        halo.setTag("halo");
+
+        halo.addComponent(deltaTime -> halo.setCenter(sun.getCenter()));
+
+        gameObjects.addGameObject(halo, layer);
+
         return halo;
     }
-
 }
