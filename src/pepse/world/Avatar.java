@@ -27,6 +27,7 @@ public class Avatar extends GameObject {
      */
     private Avatar(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable) {
         super(topLeftCorner, dimensions, renderable);
+
     }
 
     public static Avatar create(GameObjectCollection gameObjects,

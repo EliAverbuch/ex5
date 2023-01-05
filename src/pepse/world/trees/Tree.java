@@ -7,6 +7,7 @@ import pepse.world.Terrain;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Tree {
@@ -21,6 +22,8 @@ public class Tree {
     private final int treeLayer;
     private final Color trunkColor;
     private final Color leafColor;
+//    private HashMap<Integer, ArrayList<Block>> currTerrain = new HashMap<>();
+//    private HashMap<Integer, ArrayList<Block>> currTerrain = new HashMap<>();
 
     public Tree(GameObjectCollection gameObjects, Terrain terrain,
                                                 Vector2 windowDimension,
@@ -45,7 +48,7 @@ public class Tree {
         for (int i = actualMinX; i < actualMaxX; i += Block.SIZE) {
             if(random.nextDouble() <= CREATE_TREE_COIN){
 
-                System.out.println("creating tree");
+
 
                 float heightAtI = terrain.groundHeightAt(i);
 
@@ -60,6 +63,15 @@ public class Tree {
                              new Vector2( i + 4 * Block.SIZE, (float) (windowDimension.y() - randomHeightOfTree1 + 2 * Block.SIZE)),
                              leafColor, treeLayer);
             }
+        }
+    }
+
+    public  void removeInRange(float right, float left)  {
+        int actualRight = (int) right;
+        int actualLeft = (int) left;
+
+        while (actualLeft <= actualRight) {
+            Trunk.removeInRange(gameObjects, actualLeft);
         }
     }
 }

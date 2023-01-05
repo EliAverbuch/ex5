@@ -9,6 +9,8 @@ import pepse.util.ColorSupplier;
 import pepse.util.PerslinNoise;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Terrain {
     private final GameObjectCollection gameObjects;
@@ -16,7 +18,7 @@ public class Terrain {
     private final Vector2 windowDimensions;
     private final float groundHeightAtX0;
     private final PerslinNoise perslinNoise;
-    //private static final int TERRAIN_DEPTH = 20;
+    private HashMap<Integer, ArrayList<Block>> currTerrain = new HashMap<>();
     private static final Color BASE_GROUND_COLOR = new Color(212, 123, 74);
 
     public Terrain(GameObjectCollection gameObjects,
@@ -49,28 +51,54 @@ public class Terrain {
 
         int numOfColumn = (actualMaxX - actualMinX) / Block.SIZE;
 
-        for (int i = 0; i < numOfColumn; i++) {
 
-            float columnHeight = (float) Math.floor(groundHeightAt(actualMinX + i * Block.SIZE));
+            for (int i = 0; i < numOfColumn; i++) {
 
-            int numOfBlocksPerColumn = (int)(windowDimensions.y() - columnHeight) / Block.SIZE;
+                ArrayList<Block> arrayCol = new ArrayList<>();
 
-            for (int j = 0; j < numOfBlocksPerColumn; j++) {
+                float columnHeight = (float) Math.floor(groundHeightAt(actualMinX + i * Block.SIZE));
 
-                Renderable renderable =
-                        new RectangleRenderable(ColorSupplier.approximateColor(BASE_GROUND_COLOR));
+                int numOfBlocksPerColumn = (int) (windowDimensions.y() - columnHeight) / Block.SIZE;
+                if(!this.currTerrain.containsKey(actualMinX + i * Block.SIZE))
+                {
+                    for (int j = 0; j < numOfBlocksPerColumn; j++) {
 
-                Vector2 topLeftCorner= new Vector2(actualMinX + i * Block.SIZE,
-                                   windowDimensions.y() - (j + 1) * Block.SIZE);
+                        Renderable renderable =
+                                new RectangleRenderable(ColorSupplier.approximateColor(BASE_GROUND_COLOR));
 
-                Block block = new Block(topLeftCorner,renderable);
+                        Vector2 topLeftCorner = new Vector2(actualMinX + i * Block.SIZE,
+                                windowDimensions.y() - (j + 1) * Block.SIZE);
 
-                block.setTag("ground");
+                        Block block = new Block(topLeftCorner, renderable);
 
-                gameObjects.addGameObject(block, groundLayer); // שלחנן אותו עם Layer.STATIC_OBJECTS.
+                        block.setTag("ground");
 
+                        gameObjects.addGameObject(block, groundLayer); // שלחנן אותו עם Layer.STATIC_OBJECTS.
+
+                        arrayCol.add(block);
+
+                    }
+                }
+
+                this.currTerrain.put(actualMinX + i * Block.SIZE, arrayCol);
             }
+
+    }
+
+    public void removeInRange(double right, double left){
+        int actualRight = (int) right;
+        int actualLeft = (int) left;
+
+        while (actualLeft<actualRight){
+            if(this.currTerrain.containsKey(actualLeft)){
+                for (int i = 0; i < currTerrain.get(actualLeft).size(); i++) {
+                    this.gameObjects.removeGameObject(currTerrain.get(actualLeft).remove(i));
+                }
+                this.currTerrain.remove(actualLeft);
+            }
+            actualLeft++;
         }
+
     }
 
 

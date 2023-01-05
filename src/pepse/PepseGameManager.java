@@ -10,6 +10,7 @@ import danogl.gui.WindowController;
 import danogl.gui.rendering.Camera;
 import danogl.util.Vector2;
 import pepse.world.Avatar;
+import pepse.world.Block;
 import pepse.world.Sky;
 import pepse.world.Terrain;
 import pepse.world.daynight.Night;
@@ -33,8 +34,32 @@ public class PepseGameManager extends GameManager {
     private final Color trunkColor = new Color(100, 50, 20);
     private final Color leafColor = new Color(50, 200, 30);
     private static final int TREE_LAYER = Layer.STATIC_OBJECTS  - 1;
+
+    private UserInputListener inputListener;
+    private Avatar avatar;
+    private Terrain terrain;
+    private Tree tree;
+
     public PepseGameManager(String windowTitle, Vector2 windowDimensions) {
         super(windowTitle, windowDimensions);
+
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        terrain.createInRange( (int)avatar.getCenter().x() ,
+                (int)avatar.getCenter().x() + 40*Block.SIZE);
+        terrain.createInRange((int)avatar.getCenter().x() - 40*Block.SIZE  ,
+                (int)avatar.getCenter().x());
+
+        tree.createInRange( (int)avatar.getCenter().x() ,
+                (int)avatar.getCenter().x() + 40*Block.SIZE);
+        tree.createInRange((int)avatar.getCenter().x() - 40*Block.SIZE  ,
+                (int)avatar.getCenter().x());
+
+        terrain.removeInRange(avatar.getCenter().x() - BOARD_WIDTH / 2- 10* Block.SIZE,
+                avatar.getCenter().x() - BOARD_WIDTH / 2- 15* Block.SIZE);
 
     }
 
@@ -43,6 +68,7 @@ public class PepseGameManager extends GameManager {
                                SoundReader soundReader,
                                UserInputListener inputListener,
                                WindowController windowController) {
+        this.inputListener = inputListener;
 
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
 
@@ -50,7 +76,7 @@ public class PepseGameManager extends GameManager {
 
         Sky.create(gameObjects(), windowDimension, Layer.BACKGROUND);
 
-        Terrain terrain = new Terrain(gameObjects(), Layer.STATIC_OBJECTS,
+        this.terrain = new Terrain(gameObjects(), Layer.STATIC_OBJECTS,
                                                   windowDimension,SEED);
         terrain.createInRange(0, (int)windowController.getWindowDimensions().x());
 
@@ -65,12 +91,12 @@ public class PepseGameManager extends GameManager {
         SunHalo.create(gameObjects(),SUN_HALO_LAYER, sun, SUN_HALO_COLOR);
 
 
-        Tree tree  = new Tree(gameObjects(), terrain,
+        this.tree  = new Tree(gameObjects(), terrain,
                 windowController.getWindowDimensions(),
                 TREE_LAYER, trunkColor,  leafColor, SEED);
         tree.createInRange(0, (int)windowController.getWindowDimensions().x());
 
-         Avatar avatar = Avatar.create(gameObjects(), AVATAR_LAYER,
+         this.avatar = Avatar.create(gameObjects(), AVATAR_LAYER,
                  new Vector2(0,terrain.groundHeightAt(0) -67), inputListener, imageReader);
 
         setCamera(new Camera(avatar, Vector2.ZERO, windowDimension, windowDimension));
